@@ -12,6 +12,7 @@ import PostListView from './components/PostListView';
 import PostModal from './components/PostModal';
 import SettingsModal from './components/SettingsModal';
 import PillarManagerModal from './components/PillarManagerModal';
+import InfoModal from './components/InfoModal';
 import { exportPlanAsPDF } from './utils/pdfExport';
 import { fetchFromGoogleSheets, syncToGoogleSheets } from './utils/googleSheets';
 import { 
@@ -24,7 +25,8 @@ import {
   Sliders, 
   Sparkles, 
   CheckCircle,
-  FolderPlus
+  FolderPlus,
+  HelpCircle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -55,6 +57,7 @@ export default function App() {
   const [preSelectedDate, setPreSelectedDate] = useState<string | undefined>(undefined);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isPillarModalOpen, setIsPillarModalOpen] = useState(false);
+  const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
   const [isPdfDropdownOpen, setIsPdfDropdownOpen] = useState(false);
 
   // Success toast feedback state
@@ -472,10 +475,19 @@ export default function App() {
             <span className="hidden sm:inline">Pillars</span>
           </button>
 
+           {/* Help/Info Button */}
+          <button
+            onClick={() => setIsInfoModalOpen(true)}
+            className="p-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-750 dark:text-slate-350 rounded-lg transition-all cursor-pointer"
+            title="Help / Info"
+          >
+            <HelpCircle className="w-4 h-4" />
+          </button>
+
           {/* Planner Settings Control Panel Trigger */}
           <button
             onClick={() => setIsSettingsOpen(true)}
-            className="p-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg transition-all cursor-pointer"
+            className="p-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-705 dark:text-slate-305 rounded-lg transition-all cursor-pointer"
             title="Planner Settings"
           >
             <Settings className="w-4 h-4 animate-hover-spin" />
@@ -591,6 +603,12 @@ export default function App() {
         postsCountByPillar={postsCountByPillar}
         onAddPillar={handleAddPillar}
         onDeletePillar={handleDeletePillar}
+      />
+
+      {/* Info / Help Modal */}
+      <InfoModal 
+        isOpen={isInfoModalOpen}
+        onClose={() => setIsInfoModalOpen(false)}
       />
 
       {/* Status Toasts/Alerts overlay */}
