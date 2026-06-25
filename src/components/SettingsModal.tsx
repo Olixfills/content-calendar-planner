@@ -1,17 +1,17 @@
-import { useState } from 'react';
-import { PillarConfig } from '../types';
-import { motion, AnimatePresence } from 'motion/react';
-import { 
-  X, 
-  Settings, 
-  Database, 
-  RefreshCw, 
+import React, { useState } from "react";
+import { PillarConfig } from "../types";
+import { motion, AnimatePresence } from "motion/react";
+import {
+  X,
+  Settings,
+  Database,
+  RefreshCw,
   Trash,
   Link,
   Clipboard,
   Check,
-  FileSpreadsheet
-} from 'lucide-react';
+  FileSpreadsheet,
+} from "lucide-react";
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -28,7 +28,7 @@ export default function SettingsModal({
   onResetDefaults,
   onClearAll,
   googleSheetsUrl,
-  onSaveGoogleSheetsUrl
+  onSaveGoogleSheetsUrl,
 }: SettingsModalProps) {
   const [sheetUrlInput, setSheetUrlInput] = useState(googleSheetsUrl);
   const [copied, setCopied] = useState(false);
@@ -69,10 +69,16 @@ function doGet(e) {
   for (let i = 1; i < postsRows.length; i++) {
     const row = postsRows[i];
     if (!row[0]) continue;
+    let dateStr = "";
+    if (row[2] instanceof Date) {
+      dateStr = Utilities.formatDate(row[2], ss.getSpreadsheetTimeZone(), "yyyy-MM-dd");
+    } else if (row[2]) {
+      dateStr = String(row[2]);
+    }
     posts.push({
       id: String(row[0]),
       title: String(row[1]),
-      date: String(row[2]),
+      date: dateStr,
       pillar: String(row[3]),
       platforms: String(row[4]) ? String(row[4]).split(",") : [],
       status: String(row[5]),
@@ -151,7 +157,7 @@ function doPost(e) {
         initial={{ scale: 0.95, y: 15, opacity: 0 }}
         animate={{ scale: 1, y: 0, opacity: 1 }}
         exit={{ scale: 0.95, y: 15, opacity: 0 }}
-        transition={{ type: 'spring', duration: 0.4 }}
+        transition={{ type: "spring", duration: 0.4 }}
         className="relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl w-full max-w-lg overflow-hidden z-10 flex flex-col max-h-[85vh]"
       >
         {/* Header */}
@@ -181,9 +187,11 @@ function doPost(e) {
                 <FileSpreadsheet className="w-4 h-4 text-emerald-500" />
                 <span>Google Sheet Database Backend</span>
               </h4>
-              
+
               <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-normal">
-                Synchronize your calendar posts & pillars automatically with a Google Sheet. Follow the instructions to set up your backend spreadsheet.
+                Synchronize your calendar posts & pillars automatically with a
+                Google Sheet. Follow the instructions to set up your backend
+                spreadsheet.
               </p>
 
               <div className="flex justify-between items-center bg-white dark:bg-slate-900 p-2.5 rounded-lg border border-slate-200/60 dark:border-slate-800">
@@ -195,15 +203,28 @@ function doPost(e) {
                   onClick={handleCopyScript}
                   className="flex items-center gap-1 text-[10px] font-bold bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 px-2 py-1 rounded hover:bg-indigo-100/70 transition-all cursor-pointer"
                 >
-                  {copied ? <Check className="w-3 h-3 text-emerald-500" /> : <Clipboard className="w-3 h-3" />}
-                  <span>{copied ? 'Copied' : 'Copy Code'}</span>
+                  {copied ? (
+                    <Check className="w-3 h-3 text-emerald-500" />
+                  ) : (
+                    <Clipboard className="w-3 h-3" />
+                  )}
+                  <span>{copied ? "Copied" : "Copy Code"}</span>
                 </button>
               </div>
 
               <div className="text-[10px] text-slate-400 dark:text-slate-500 leading-normal pl-2 border-l border-indigo-500 space-y-1">
-                <p>2. Open Google Sheets, create a spreadsheet & open <strong>Extensions &gt; Apps Script</strong>.</p>
-                <p>3. Paste the code, save, click <strong>Deploy &gt; New Deployment</strong>.</p>
-                <p>4. Set "Execute as" to <strong>Me</strong> and "Who has access" to <strong>Anyone</strong>.</p>
+                <p>
+                  2. Open Google Sheets, create a spreadsheet & open{" "}
+                  <strong>Extensions &gt; Apps Script</strong>.
+                </p>
+                <p>
+                  3. Paste the code, save, click{" "}
+                  <strong>Deploy &gt; New Deployment</strong>.
+                </p>
+                <p>
+                  4. Set "Execute as" to <strong>Me</strong> and "Who has
+                  access" to <strong>Anyone</strong>.
+                </p>
                 <p>5. Copy the generated Web App URL and paste below.</p>
               </div>
 
@@ -245,7 +266,9 @@ function doPost(e) {
                 <span>Storage Information</span>
               </h4>
               <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                Your content schedule and customized pillars are saved in your browser's persistent **Local Storage**. This means your changes remain intact even when you refresh or close this tab.
+                Your content schedule and customized pillars are saved in your
+                browser's persistent **Local Storage**. This means your changes
+                remain intact even when you refresh or close this tab.
               </p>
             </div>
 
@@ -265,7 +288,8 @@ function doPost(e) {
                       Reset to Demo Templates
                     </h5>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                      Overwrites all current posts and custom pillars with a clean blueprint.
+                      Overwrites all current posts and custom pillars with a
+                      clean blueprint.
                     </p>
                     <button
                       onClick={() => {
@@ -289,7 +313,8 @@ function doPost(e) {
                       Clear All Calendar Data
                     </h5>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                      Deletes all scheduled posts from your active database. Your custom content pillars will remain.
+                      Deletes all scheduled posts from your active database.
+                      Your custom content pillars will remain.
                     </p>
                     <button
                       onClick={() => {
