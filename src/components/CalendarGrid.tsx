@@ -1,7 +1,7 @@
 import React from 'react';
-import { Post, PillarConfig } from '../types';
+import { Post, PillarConfig, getPlatformStyle } from '../types';
 import { CalendarCell, generateCalendarGrid } from '../utils';
-import { Youtube, Instagram, Music, Plus } from 'lucide-react';
+import { Youtube, Instagram, Music, Plus, Globe, Linkedin } from 'lucide-react';
 
 interface CalendarGridProps {
   posts: Post[];
@@ -94,15 +94,24 @@ export default function CalendarGrid({
   };
 
   const getPlatformIcon = (platform: string) => {
+    const style = getPlatformStyle(platform);
     switch (platform) {
       case 'YouTube Shorts':
-        return <Youtube className="w-3 h-3 text-rose-600 dark:text-rose-400 shrink-0" title="YouTube Shorts" />;
+        return <Youtube className={`w-3 h-3 ${style.dotClass} shrink-0`} title="YouTube Shorts" />;
       case 'TikTok':
-        return <Music className="w-3 h-3 text-sky-600 dark:text-sky-400 shrink-0" title="TikTok" />;
+        return <Music className={`w-3 h-3 ${style.dotClass} shrink-0`} title="TikTok" />;
       case 'Instagram Reels':
-        return <Instagram className="w-3 h-3 text-pink-600 dark:text-pink-400 shrink-0" title="Instagram Reels" />;
+        return <Instagram className={`w-3 h-3 ${style.dotClass} shrink-0`} title="Instagram Reels" />;
+      case 'X':
+        return (
+          <svg className={`w-3 h-3 ${style.dotClass} shrink-0`} viewBox="0 0 24 24" fill="currentColor" aria-label="X">
+            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+          </svg>
+        );
+      case 'LinkedIn':
+        return <Linkedin className={`w-3 h-3 ${style.dotClass} shrink-0`} title="LinkedIn" />;
       default:
-        return null;
+        return <Globe className={`w-3 h-3 ${style.dotClass} shrink-0`} title={platform} />;
     }
   };
 

@@ -7,10 +7,9 @@ import {
   Database,
   RefreshCw,
   Trash,
-  Link,
   Clipboard,
   Check,
-  FileSpreadsheet,
+  FileSpreadsheet
 } from "lucide-react";
 
 interface SettingsModalProps {
@@ -28,7 +27,7 @@ export default function SettingsModal({
   onResetDefaults,
   onClearAll,
   googleSheetsUrl,
-  onSaveGoogleSheetsUrl,
+  onSaveGoogleSheetsUrl
 }: SettingsModalProps) {
   const [sheetUrlInput, setSheetUrlInput] = useState(googleSheetsUrl);
   const [copied, setCopied] = useState(false);

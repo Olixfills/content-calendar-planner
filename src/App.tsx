@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Post, PillarConfig } from './types';
+import { Post, PillarConfig, Platform, DEFAULT_PLATFORMS } from './types';
 import { getInitialPillars, getInitialPosts } from './initialData';
 import { 
   matchesFilters, 
@@ -12,6 +12,7 @@ import PostListView from './components/PostListView';
 import PostModal from './components/PostModal';
 import SettingsModal from './components/SettingsModal';
 import PillarManagerModal from './components/PillarManagerModal';
+import PlatformManagerModal from './components/PlatformManagerModal';
 import InfoModal from './components/InfoModal';
 import { exportPlanAsPDF } from './utils/pdfExport';
 import { fetchFromGoogleSheets, syncToGoogleSheets } from './utils/googleSheets';
@@ -38,6 +39,18 @@ export default function App() {
     return localStorage.getItem('ccp_google_sheets_url') || '';
   });
 
+  // Dynamic Platforms state
+  const [availablePlatforms, setAvailablePlatforms] = useState<Platform[]>(() => {
+    const stored = localStorage.getItem('ccp_platforms');
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      } catch (e) {}
+    }
+    return DEFAULT_PLATFORMS;
+  });
+
   // Track the active calendar month and year
   const [currentYear, setCurrentYear] = useState(() => new Date().getFullYear());
   const [currentMonth, setCurrentMonth] = useState(() => new Date().getMonth()); // 0-indexed
@@ -57,6 +70,7 @@ export default function App() {
   const [preSelectedDate, setPreSelectedDate] = useState<string | undefined>(undefined);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isPillarModalOpen, setIsPillarModalOpen] = useState(false);
+  const [isPlatformModalOpen, setIsPlatformModalOpen] = useState(false);
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
   const [isPdfDropdownOpen, setIsPdfDropdownOpen] = useState(false);
 
@@ -114,6 +128,27 @@ export default function App() {
     }
     loadData();
   }, [googleSheetsUrl]);
+
+  // Save platforms helper
+  const savePlatforms = (newPlatforms: Platform[]) => {
+    setAvailablePlatforms(newPlatforms);
+    localStorage.setItem('ccp_platforms', JSON.stringify(newPlatforms));
+  };
+
+  const handleAddPlatform = (platformName: string) => {
+    if (availablePlatforms.includes(platformName)) return;
+    const next = [...availablePlatforms, platformName];
+    savePlatforms(next);
+    showToast(`📱 Platform "${platformName}" added!`);
+  };
+
+  const handleDeletePlatform = (platformName: string) => {
+    // Prevent deleting default platforms
+    if (DEFAULT_PLATFORMS.includes(platformName)) return;
+    const next = availablePlatforms.filter(p => p !== platformName);
+    savePlatforms(next);
+    showToast(`🗑️ Platform "${platformName}" removed.`);
+  };
 
   // --- PERSIST SAVES & SYNC WRAPPERS ---
   const savePosts = (newPosts: Post[]) => {
@@ -296,6 +331,7 @@ export default function App() {
       const defaultPosts = getInitialPosts();
       savePillars(defaultPillars);
       savePosts(defaultPosts);
+      savePlatforms(DEFAULT_PLATFORMS);
       handleGoToToday();
       showToast('🔄 Content calendar restored to clean templates.');
     }
@@ -518,6 +554,8 @@ export default function App() {
           pillars={pillars}
           year={currentYear} 
           month={currentMonth} 
+          availablePlatforms={availablePlatforms}
+          onManagePlatforms={() => setIsPlatformModalOpen(true)}
         />
 
         {/* Dynamic Filters & Search & Add Buttons */}
@@ -538,6 +576,7 @@ export default function App() {
             setIsModalOpen(true);
           }}
           pillars={pillars}
+          availablePlatforms={availablePlatforms}
         />
 
         {/* Dynamic Content Views */}
@@ -583,6 +622,7 @@ export default function App() {
         post={editingPost}
         initialDate={preSelectedDate}
         pillars={pillars}
+        availablePlatforms={availablePlatforms}
       />
 
       {/* Combined Single-User Planner Settings Modal */}
@@ -603,6 +643,15 @@ export default function App() {
         postsCountByPillar={postsCountByPillar}
         onAddPillar={handleAddPillar}
         onDeletePillar={handleDeletePillar}
+      />
+
+      {/* Dedicated Social Platform Manager Modal */}
+      <PlatformManagerModal
+        isOpen={isPlatformModalOpen}
+        onClose={() => setIsPlatformModalOpen(false)}
+        availablePlatforms={availablePlatforms}
+        onAddPlatform={handleAddPlatform}
+        onDeletePlatform={handleDeletePlatform}
       />
 
       {/* Info / Help Modal */}

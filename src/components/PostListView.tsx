@@ -1,5 +1,5 @@
-import { Post, STATUS_CONFIGS, PillarConfig } from '../types';
-import { Edit2, Youtube, Instagram, Music, Calendar, Clock, ArrowUpDown } from 'lucide-react';
+import { Post, STATUS_CONFIGS, PillarConfig, getPlatformStyle } from '../types';
+import { Edit2, Youtube, Instagram, Music, Calendar, Clock, ArrowUpDown, Globe, Linkedin } from 'lucide-react';
 import { useState } from 'react';
 
 interface PostListViewProps {
@@ -46,15 +46,21 @@ export default function PostListView({ posts, pillars, year, month, onEditPost }
   };
 
   const getPlatformLabel = (platform: string) => {
+    const style = getPlatformStyle(platform);
+    const badgeClass = `inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${style.bgClass} ${style.textClass} border ${style.borderClass}`;
     switch (platform) {
       case 'YouTube Shorts':
-        return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-950/20 dark:text-rose-400 dark:border-rose-900/30"><Youtube className="w-3 h-3 text-rose-600" /> Shorts</span>;
+        return <span className={badgeClass}><Youtube className="w-3 h-3" /> Shorts</span>;
       case 'TikTok':
-        return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-200 dark:bg-sky-950/20 dark:text-sky-400 dark:border-sky-900/30"><Music className="w-3 h-3 text-sky-500" /> TikTok</span>;
+        return <span className={badgeClass}><Music className="w-3 h-3" /> TikTok</span>;
       case 'Instagram Reels':
-        return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-pink-50 text-pink-700 border border-pink-200 dark:bg-pink-950/20 dark:text-pink-400 dark:border-pink-900/30"><Instagram className="w-3 h-3 text-pink-500" /> Reels</span>;
+        return <span className={badgeClass}><Instagram className="w-3 h-3" /> Reels</span>;
+      case 'X':
+        return <span className={badgeClass}><svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg> X</span>;
+      case 'LinkedIn':
+        return <span className={badgeClass}><Linkedin className="w-3 h-3" /> LinkedIn</span>;
       default:
-        return null;
+        return <span className={badgeClass}><Globe className="w-3 h-3" /> {platform}</span>;
     }
   };
 

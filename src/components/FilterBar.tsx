@@ -1,4 +1,4 @@
-import { PLATFORMS, STATUSES, PillarConfig } from '../types';
+import { STATUSES, PillarConfig, Platform } from '../types';
 import { Search, RotateCcw, SlidersHorizontal } from 'lucide-react';
 
 interface FilterBarProps {
@@ -14,6 +14,7 @@ interface FilterBarProps {
   setViewMode: (v: 'calendar' | 'list') => void;
   onAddClick: () => void;
   pillars: PillarConfig[];
+  availablePlatforms: Platform[];
 }
 
 export default function FilterBar({
@@ -27,7 +28,8 @@ export default function FilterBar({
   setSelectedStatus,
   viewMode,
   setViewMode,
-  pillars
+  pillars,
+  availablePlatforms
 }: FilterBarProps) {
   
   const hasActiveFilters = 
@@ -117,7 +119,7 @@ export default function FilterBar({
             className="px-2.5 py-1.5 text-xs bg-slate-50 hover:bg-slate-100/70 focus:bg-white border border-slate-200 rounded-lg outline-none cursor-pointer transition-all dark:bg-slate-950 dark:border-slate-800 dark:text-slate-100"
           >
             <option value="all">📱 All Platforms</option>
-            {PLATFORMS.map(p => (
+            {availablePlatforms.map(p => (
               <option key={p} value={p}>{p}</option>
             ))}
           </select>

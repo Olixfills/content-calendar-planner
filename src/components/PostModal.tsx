@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Post, Pillar, Platform, PostStatus, PLATFORMS, STATUSES, STATUS_CONFIGS, PillarConfig } from '../types';
-import { X, Calendar as CalendarIcon, Clock, AlignLeft, Trash2, Youtube, Instagram, Music, Check, Sparkles } from 'lucide-react';
+import { Post, Pillar, Platform, PostStatus, STATUSES, STATUS_CONFIGS, PillarConfig, getPlatformStyle } from '../types';
+import { X, Calendar as CalendarIcon, Clock, AlignLeft, Trash2, Youtube, Instagram, Music, Check, Sparkles, Globe, Linkedin } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface PostModalProps {
@@ -11,6 +11,7 @@ interface PostModalProps {
   post?: Post | null; // If passed, we are EDITING. If null/undefined, we are ADDING.
   initialDate?: string; // If passed, default the date to this (useful when clicking a calendar day cell!)
   pillars: PillarConfig[];
+  availablePlatforms: Platform[];
 }
 
 export default function PostModal({
@@ -20,7 +21,8 @@ export default function PostModal({
   onDelete,
   post,
   initialDate,
-  pillars
+  pillars,
+  availablePlatforms
 }: PostModalProps) {
   const isEditing = !!post;
 
@@ -53,13 +55,13 @@ export default function PostModal({
       setDate(initialDate || new Date().toISOString().split('T')[0]);
       setTime('12:00');
       setPillar(pillars[0]?.name || '');
-      setPlatforms(['YouTube Shorts']); // Default to at least one platform
+      setPlatforms(availablePlatforms.length > 0 ? [availablePlatforms[0]] : []);
       setStatus('Idea');
       setNotes('');
       setRecurring('none');
     }
     setErrors({});
-  }, [post, initialDate, isOpen, pillars]);
+  }, [post, initialDate, isOpen, pillars, availablePlatforms]);
 
   if (!isOpen) return null;
 
@@ -114,6 +116,16 @@ export default function PostModal({
         return <Music className="w-4 h-4" />;
       case 'Instagram Reels':
         return <Instagram className="w-4 h-4" />;
+      case 'X':
+        return (
+          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+          </svg>
+        );
+      case 'LinkedIn':
+        return <Linkedin className="w-4 h-4" />;
+      default:
+        return <Globe className="w-4 h-4" />;
     }
   };
 
@@ -121,15 +133,24 @@ export default function PostModal({
     if (!isSelected) {
       return 'border-slate-200 dark:border-slate-800 text-slate-500 bg-slate-50 hover:bg-slate-100/80 dark:bg-slate-950';
     }
+    const style = getPlatformStyle(p);
+    return `border-current ${style.bgClass} ${style.textClass} font-semibold`;
+  };
+
+  const getPlatformDisplayName = (p: Platform) => {
     switch (p) {
-      case 'YouTube Shorts':
-        return 'border-rose-500 bg-rose-50 text-rose-700 dark:bg-rose-950/20 dark:text-rose-400 font-semibold';
-      case 'TikTok':
-        return 'border-sky-500 bg-sky-50 text-sky-700 dark:bg-sky-950/20 dark:text-sky-400 font-semibold';
-      case 'Instagram Reels':
-        return 'border-pink-500 bg-pink-50 text-pink-700 dark:bg-pink-950/20 dark:text-pink-400 font-semibold';
+      case 'YouTube Shorts': return 'YouTube';
+      case 'Instagram Reels': return 'Instagram';
+      default: return p;
     }
   };
+
+  // Determine grid columns based on platform count
+  const platformGridCols = availablePlatforms.length <= 3
+    ? 'grid-cols-3'
+    : availablePlatforms.length <= 4
+      ? 'grid-cols-2 sm:grid-cols-4'
+      : 'grid-cols-2 sm:grid-cols-3';
 
   return (
     <AnimatePresence>
@@ -283,8 +304,8 @@ export default function PostModal({
                 </label>
                 <span className="text-[10px] text-slate-400 font-medium">(Select Multiple)</span>
               </div>
-              <div className="grid grid-cols-3 gap-2">
-                {PLATFORMS.map(p => {
+              <div className={`grid ${platformGridCols} gap-2`}>
+                {availablePlatforms.map(p => {
                   const isSelected = platforms.includes(p);
                   return (
                     <button
@@ -294,7 +315,7 @@ export default function PostModal({
                       className={`px-3 py-2.5 rounded-lg border text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${getPlatformClass(p, isSelected)}`}
                     >
                       {getPlatformIcon(p)}
-                      <span className="truncate">{p.split(' ')[0]}</span>
+                      <span className="truncate">{getPlatformDisplayName(p)}</span>
                       {isSelected && <Check className="w-3.5 h-3.5 shrink-0" />}
                     </button>
                   );

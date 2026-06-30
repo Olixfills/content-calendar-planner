@@ -1,6 +1,6 @@
 export type Pillar = string;
 
-export type Platform = 'YouTube Shorts' | 'TikTok' | 'Instagram Reels';
+export type Platform = string;
 
 export type PostStatus = 'Idea' | 'Scripting' | 'Filming' | 'Scheduled' | 'Posted';
 
@@ -16,11 +16,16 @@ export interface Post {
   recurring?: 'none' | 'monthly';
 }
 
-export const PLATFORMS: Platform[] = [
+export const DEFAULT_PLATFORMS: Platform[] = [
   'YouTube Shorts',
   'TikTok',
-  'Instagram Reels'
+  'Instagram Reels',
+  'X',
+  'LinkedIn'
 ];
+
+// Backward compat alias
+export const PLATFORMS: Platform[] = DEFAULT_PLATFORMS;
 
 export const STATUSES: PostStatus[] = [
   'Idea',
@@ -170,3 +175,96 @@ export const STATUS_CONFIGS: Record<PostStatus, { label: string; bg: string; tex
     border: 'border-emerald-200 dark:border-emerald-850'
   }
 };
+
+/**
+ * Platform visual configuration for rendering icons, colors, and short labels.
+ * Known platforms get specific colors; custom ones get a neutral fallback.
+ */
+export interface PlatformStyle {
+  shortLabel: string;
+  icon: string; // lucide icon name hint
+  color: string; // accent hex
+  bgClass: string;
+  textClass: string;
+  borderClass: string;
+  dotClass: string;
+  circleBg: string;
+  circleText: string;
+}
+
+export const PLATFORM_STYLES: Record<string, PlatformStyle> = {
+  'YouTube Shorts': {
+    shortLabel: 'YT',
+    icon: 'youtube',
+    color: '#ef4444',
+    bgClass: 'bg-rose-50 dark:bg-rose-950/20',
+    textClass: 'text-rose-700 dark:text-rose-400',
+    borderClass: 'border-rose-200 dark:border-rose-900/30',
+    dotClass: 'text-rose-600 dark:text-rose-400',
+    circleBg: 'bg-rose-100',
+    circleText: 'text-rose-600',
+  },
+  'TikTok': {
+    shortLabel: 'TK',
+    icon: 'music',
+    color: '#0ea5e9',
+    bgClass: 'bg-sky-50 dark:bg-sky-950/20',
+    textClass: 'text-sky-700 dark:text-sky-400',
+    borderClass: 'border-sky-200 dark:border-sky-900/30',
+    dotClass: 'text-sky-600 dark:text-sky-400',
+    circleBg: 'bg-sky-100',
+    circleText: 'text-sky-600',
+  },
+  'Instagram Reels': {
+    shortLabel: 'IG',
+    icon: 'instagram',
+    color: '#ec4899',
+    bgClass: 'bg-pink-50 dark:bg-pink-950/20',
+    textClass: 'text-pink-700 dark:text-pink-400',
+    borderClass: 'border-pink-200 dark:border-pink-900/30',
+    dotClass: 'text-pink-600 dark:text-pink-400',
+    circleBg: 'bg-pink-100',
+    circleText: 'text-pink-600',
+  },
+  'X': {
+    shortLabel: 'X',
+    icon: 'twitter',
+    color: '#1d9bf0',
+    bgClass: 'bg-slate-50 dark:bg-slate-950/20',
+    textClass: 'text-slate-700 dark:text-slate-400',
+    borderClass: 'border-slate-300 dark:border-slate-700',
+    dotClass: 'text-slate-800 dark:text-slate-300',
+    circleBg: 'bg-slate-200',
+    circleText: 'text-slate-700',
+  },
+  'LinkedIn': {
+    shortLabel: 'LI',
+    icon: 'linkedin',
+    color: '#0a66c2',
+    bgClass: 'bg-blue-50 dark:bg-blue-950/20',
+    textClass: 'text-blue-700 dark:text-blue-400',
+    borderClass: 'border-blue-200 dark:border-blue-900/30',
+    dotClass: 'text-blue-600 dark:text-blue-400',
+    circleBg: 'bg-blue-100',
+    circleText: 'text-blue-600',
+  },
+};
+
+export const DEFAULT_PLATFORM_STYLE: PlatformStyle = {
+  shortLabel: '??',
+  icon: 'globe',
+  color: '#6366f1',
+  bgClass: 'bg-violet-50 dark:bg-violet-950/20',
+  textClass: 'text-violet-700 dark:text-violet-400',
+  borderClass: 'border-violet-200 dark:border-violet-900/30',
+  dotClass: 'text-violet-600 dark:text-violet-400',
+  circleBg: 'bg-violet-100',
+  circleText: 'text-violet-600',
+};
+
+export function getPlatformStyle(platform: string): PlatformStyle {
+  return PLATFORM_STYLES[platform] || {
+    ...DEFAULT_PLATFORM_STYLE,
+    shortLabel: platform.slice(0, 2).toUpperCase(),
+  };
+}
